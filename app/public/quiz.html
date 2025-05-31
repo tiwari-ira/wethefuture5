@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amendment Clash - Constitutional Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="modern.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: linear-gradient(135deg, #101a2b 0%, #23395d 100%);
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      margin-top: 20px; /* Add margin to prevent overlap with navbar */
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .title {
+      font-size: 3.5em;
+      color: #fff;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+      margin-bottom: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+    .subtitle {
+      font-size: 1.3em;
+      color: #e8f4f8;
+      font-weight: 300;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 25px;
+      padding: 40px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .start-screen { text-align: center; }
+    .player-setup { margin-bottom: 30px; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label {
+      display: block;
+      font-size: 1.1em;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e8f4f8;
+    }
+    .input-group input, .input-group select {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 16px;
+      font-size: 1.1em;
+      border: 2px solid #23395d;
+      border-radius: 12px;
+      background: #f8fafd;
+      color: #23395d;
+      transition: all 0.3s ease;
+    }
+    .input-group input:focus, .input-group select:focus {
+      outline: none;
+      border-color: #fff;
+      background: #fff;
+      color: #23395d;
+    }
+    .btn {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: #fff;
+      color: #23395d;
+      box-shadow: 0 8px 16px rgba(35,57,93,0.08);
+    }
+    .btn-primary:hover, .btn-secondary:hover {
+      background: #23395d;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .btn-primary { background: #fff; color: #23395d; }
+    .btn-secondary { background: #e8f4f8; color: #23395d; margin-left: 10px; }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a2236, #23395d);
+      border-radius: 15px;
+      color: #fff;
+    }
+    .player-info { font-size: 1.2em; font-weight: 600; }
+    .score-info { text-align: right; }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #23395d;
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #3ec6e0;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .question-card {
+      background: #1a2236;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-left: 5px solid #3ec6e0;
+    }
+    .question-number {
+      font-size: 0.9em;
+      color: #b0b8c9;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .question-text {
+      font-size: 1.4em;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+    .options {
+      display: grid;
+      gap: 15px;
+    }
+    .option {
+      padding: 18px 24px;
+      border: 2px solid #23395d;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #fff;
+      font-size: 1.1em;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      color: #23395d;
+    }
+    .option:hover {
+      border-color: #3ec6e0;
+      background: #e8f4f8;
+      transform: translateX(5px);
+    }
+    .option.selected {
+      border-color: #3ec6e0;
+      background: #e8f4f8;
+    }
+    .option.correct {
+      border-color: #3ec6e0;
+      background: #3ec6e0;
+      color: #fff;
+      animation: correctPulse 0.6s ease;
+    }
+    .option.incorrect {
+      border-color: #e03e6f;
+      background: #fadbd8;
+      color: #e03e6f;
+      animation: incorrectShake 0.6s ease;
+    }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .quiz-controls { text-align: center; margin-top: 30px; }
+    .results-screen { text-align: center; }
+    .results-stats {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
+    .leaderboard {
+      margin-top: 40px;
+    }
+    .leaderboard-title {
+      font-size: 2.5em;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    .leaderboard-list {
+      background: #1a2236;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      border-bottom: 1px solid #23395d;
+      transition: all 0.3s ease;
+      color: #fff;
+    }
+    .leaderboard-item:last-child { border-bottom: none; }
+    .leaderboard-item:hover { background: #23395d; }
+    .leaderboard-rank { font-size: 1.8em; font-weight: 700; color: #3ec6e0; width: 60px; }
+    .leaderboard-rank.gold { color: #f1c40f; }
+    .leaderboard-rank.silver { color: #95a5a6; }
+    .leaderboard-rank.bronze { color: #e67e22; }
+    .leaderboard-info { flex-grow: 1; margin-left: 20px; }
+    .leaderboard-name { font-size: 1.3em; font-weight: 600; color: #fff; }
+    .leaderboard-details { font-size: 0.95em; color: #b0b8c9; margin-top: 2px; }
+    .leaderboard-score { font-size: 1.5em; font-weight: 700; color: #3ec6e0; }
+    .timer { font-size: 1.2em; font-weight: 600; color: #3ec6e0; }
+    .explanation {
+      background: #e8f4f8;
+      border: 1px solid #3ec6e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      font-size: 1.05em;
+      line-height: 1.6;
+      color: #23395d;
+    }
+    .explanation-title { font-weight: 700; color: #3ec6e0; margin-bottom: 8px; }
+    @media (max-width: 768px) {
+      .container { padding: 15px; }
+      .title { font-size: 2.5em; }
+      .game-card { padding: 25px; }
+      .quiz-header { flex-direction: column; gap: 15px; text-align: center; }
+      .leaderboard-item { flex-direction: column; text-align: center; gap: 10px; }
+      .leaderboard-rank { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">We the Future</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="typeracer.html">Type Racer</a></li>
+      <li><a href="quiz.html">Quiz Game</a></li>
+      <li><a href="wordle.html">Wordle Game</a></li>
+    </ul>
+  </nav>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">⚖️ Amendment Clash</h1>
+      <p class="subtitle">Test your knowledge of Constitutional amendments and history</p>
+    </div>
+    <div class="game-card">
+      <div id="start-screen" class="screen active start-screen">
+        <div class="player-setup">
+          <div class="input-group">
+            <label for="player-name">Enter Your Name:</label>
+            <input type="text" id="player-name" placeholder="Constitutional Scholar" maxlength="20">
+          </div>
+          <div class="input-group">
+            <label for="difficulty">Choose Difficulty:</label>
+            <select id="difficulty" class="input-group input">
+              <option value="easy">Easy (10 questions)</option>
+              <option value="medium" selected>Medium (15 questions)</option>
+              <option value="hard">Hard (20 questions)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+        <button class="btn btn-secondary" onclick="showLeaderboard()">View Leaderboard</button>
+      </div>
+      <div id="quiz-screen" class="screen">
+        <div class="quiz-header">
+          <div class="player-info">
+            <div id="player-display">Player Name</div>
+            <div class="timer" id="timer">Time: 30s</div>
+          </div>
+          <div class="score-info">
+            <div>Score: <span id="current-score">0</span></div>
+            <div>Question: <span id="question-counter">1/10</span></div>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="question-card">
+          <div class="question-number" id="question-number">Question 1 of 10</div>
+          <div class="question-text" id="question-text">Loading question...</div>
+          <div class="options" id="options-container"></div>
+          <div id="explanation" class="explanation" style="display: none;"></div>
+        </div>
+        <div class="quiz-controls">
+          <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+          <button class="btn btn-secondary" onclick="quitQuiz()">Quit Quiz</button>
+        </div>
+      </div>
+      <div id="results-screen" class="screen results-screen">
+        <h2>Quiz Complete!</h2>
+        <div class="results-stats">
+          <p>Score: <span id="final-score">0</span></p>
+          <p>Correct Answers: <span id="correct-answers">0</span> / <span id="total-questions">0</span></p>
+          <p>Time Taken: <span id="time-taken">0s</span></p>
+        </div>
+        <div class="quiz-controls">
+          <button class="btn btn-primary" onclick="startQuiz()">Play Again</button>
+          <button class="btn btn-secondary" onclick="showStartScreen()">Main Menu</button>
+        </div>
+      </div>
+      <div id="leaderboard-screen" class="screen">
+        <div class="leaderboard">
+          <h2 class="leaderboard-title">🏆 Leaderboard</h2>
+          <div class="leaderboard-list" id="leaderboard-list"></div>
+        </div>
+        <div class="quiz-controls">
+          <button class="btn btn-primary" onclick="showStartScreen()">Back to Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Quiz questions database
+    const QUESTIONS = {
+      easy: [
+        { question: "Which amendment guarantees freedom of speech, religion, and the press?", options: ["First Amendment", "Second Amendment", "Fourth Amendment", "Fifth Amendment"], correct: 0, explanation: "The First Amendment protects freedom of speech, religion, press, assembly, and petition." },
+        { question: "The Second Amendment protects the right to:", options: ["Free speech", "Bear arms", "Due process", "Vote"], correct: 1, explanation: "The Second Amendment protects the right to keep and bear arms." },
+        { question: "Which amendment ended slavery in the United States?", options: ["12th Amendment", "13th Amendment", "14th Amendment", "15th Amendment"], correct: 1, explanation: "The 13th Amendment, ratified in 1865, abolished slavery throughout the United States." },
+        { question: "The 19th Amendment gave voting rights to:", options: ["African Americans", "Women", "18-year-olds", "All citizens"], correct: 1, explanation: "The 19th Amendment, ratified in 1920, granted women the right to vote." },
+        { question: "Which amendment lowered the voting age to 18?", options: ["24th Amendment", "25th Amendment", "26th Amendment", "27th Amendment"], correct: 2, explanation: "The 26th Amendment, ratified in 1971, lowered the voting age to 18." },
+        { question: "The Fourth Amendment protects against:", options: ["Cruel punishment", "Unreasonable searches", "Double jeopardy", "Compelled testimony"], correct: 1, explanation: "The Fourth Amendment protects against unreasonable searches and seizures." },
+        { question: "Which amendment guarantees the right to a speedy trial?", options: ["Fifth Amendment", "Sixth Amendment", "Seventh Amendment", "Eighth Amendment"], correct: 1, explanation: "The Sixth Amendment guarantees the right to a speedy and public trial." },
+        { question: "The 21st Amendment:", options: ["Banned alcohol", "Repealed Prohibition", "Granted women's suffrage", "Ended slavery"], correct: 1, explanation: "The 21st Amendment repealed the 18th Amendment, ending Prohibition." },
+        { question: "Which amendment established the federal income tax?", options: ["14th Amendment", "15th Amendment", "16th Amendment", "17th Amendment"], correct: 2, explanation: "The 16th Amendment, ratified in 1913, gave Congress the power to collect income taxes." },
+        { question: "The Eighth Amendment prohibits:", options: ["Quartering soldiers", "Cruel and unusual punishment", "Unreasonable bail", "Both B and C"], correct: 3, explanation: "The Eighth Amendment prohibits excessive bail, excessive fines, and cruel and unusual punishment." }
+      ],
+      medium: [
+        { question: "The 14th Amendment was primarily designed to:", options: ["End slavery", "Grant citizenship to former slaves", "Give women the vote", "Establish income tax"], correct: 1, explanation: "The 14th Amendment granted citizenship to all persons born in the US and equal protection under the law." },
+        { question: "Which amendment allows Congress to directly tax income without apportionment among states?", options: ["15th Amendment", "16th Amendment", "17th Amendment", "18th Amendment"], correct: 1, explanation: "The 16th Amendment overturned the Supreme Court's decision in Pollock v. Farmers' Loan & Trust Co." },
+        { question: "The 17th Amendment changed the election of:", options: ["Presidents", "House Representatives", "Senators", "Supreme Court Justices"], correct: 2, explanation: "The 17th Amendment established direct election of senators by popular vote rather than by state legislatures." },
+        { question: "Which amendment prohibited the manufacture and sale of alcohol?", options: ["17th Amendment", "18th Amendment", "19th Amendment", "20th Amendment"], correct: 1, explanation: "The 18th Amendment established Prohibition, later repealed by the 21st Amendment." },
+        { question: "The 22nd Amendment limits:", options: ["Congressional terms", "Presidential terms", "Supreme Court terms", "Governor terms"], correct: 1, explanation: "The 22nd Amendment limits presidents to two terms in office." },
+        { question: "Which amendment deals with presidential succession?", options: ["23rd Amendment", "24th Amendment", "25th Amendment", "26th Amendment"], correct: 2, explanation: "The 25th Amendment establishes procedures for presidential succession and disability." },
+        { question: "The 24th Amendment eliminated:", options: ["Literacy tests", "Poll taxes", "Property requirements", "Age requirements"], correct: 1, explanation: "The 24th Amendment prohibited poll taxes in federal elections." },
+        { question: "Which amendment gave Washington D.C. electoral votes?", options: ["22nd Amendment", "23rd Amendment", "24th Amendment", "25th Amendment"], correct: 1, explanation: "The 23rd Amendment granted the District of Columbia electoral votes in presidential elections." },
+        { question: "The 27th Amendment deals with:", options: ["Term limits", "Congressional pay", "Voting rights", "Presidential powers"], correct: 1, explanation: "The 27th Amendment prevents Congress from giving itself immediate pay raises." },
+        { question: "Which amendment contains the Equal Protection Clause?", options: ["13th Amendment", "14th Amendment", "15th Amendment", "16th Amendment"], correct: 1, explanation: "The 14th Amendment's Equal Protection Clause requires states to provide equal protection under the law." },
+        { question: "The 20th Amendment is known as the:", options: ["Prohibition Amendment", "Lame Duck Amendment", "Women's Suffrage Amendment", "Income Tax Amendment"], correct: 1, explanation: "The 20th Amendment moved inauguration dates and reduced the 'lame duck' period." },
+        { question: "Which amendment protects against double jeopardy?", options: ["Fourth Amendment", "Fifth Amendment", "Sixth Amendment", "Seventh Amendment"], correct: 1, explanation: "The Fifth Amendment protects against double jeopardy and self-incrimination." },
+        { question: "The 15th Amendment specifically prohibits denying voting rights based on:", options: ["Gender", "Age", "Race", "Property ownership"], correct: 2, explanation: "The 15th Amendment prohibits denying voting rights based on race, color, or previous condition of servitude." },
+        { question: "Which amendment requires a warrant for most searches?", options: ["Third Amendment", "Fourth Amendment", "Fifth Amendment", "Sixth Amendment"], correct: 1, explanation: "The Fourth Amendment generally requires warrants based on probable cause for searches." },
+        { question: "The 12th Amendment changed the process for:", options: ["Electing senators", "Electing the president", "Impeachment", "Confirming judges"], correct: 1, explanation: "The 12th Amendment requires electors to vote separately for president and vice president." }
+      ],
+      hard: [
+        { question: "The 9th Amendment's purpose is to:", options: ["Limit federal power", "Protect unenumerated rights", "Define state powers", "Establish judicial review"], correct: 1, explanation: "The 9th Amendment states that enumeration of certain rights doesn't deny others retained by the people." },
+        { question: "Which amendment has never been used to remove a president from office?", options: ["20th Amendment", "22nd Amendment", "25th Amendment", "All of the above"], correct: 3, explanation: "The 25th Amendment provides for removal of disabled presidents but has never been used for that purpose." },
+        { question: "The 11th Amendment was passed in response to which Supreme Court case?", options: ["Marbury v. Madison", "Chisholm v. Georgia", "McCulloch v. Maryland", "Gibbons v. Ogden"], correct: 1, explanation: "The 11th Amendment was passed to overturn Chisholm v. Georgia, which allowed citizens to sue states." },
+        { question: "Which amendment was ratified most recently?", options: ["25th Amendment", "26th Amendment", "27th Amendment", "28th Amendment"], correct: 2, explanation: "The 27th Amendment was ratified in 1992, though it was originally proposed in 1789." },
+        { question: "The 10th Amendment is most closely associated with:", options: ["Individual rights", "Federal supremacy", "States' rights", "Separation of powers"], correct: 2, explanation: "The 10th Amendment reserves powers not delegated to the federal government to states and people." },
+        { question: "The 3rd Amendment was written primarily in response to:", options: ["British taxation", "Quartering of soldiers", "Religious persecution", "Lack of representation"], correct: 1, explanation: "The 3rd Amendment prohibits quartering soldiers in homes, addressing a grievance from British rule." },
+        { question: "Which amendment contains the Privileges or Immunities Clause?", options: ["13th Amendment", "14th Amendment", "15th Amendment", "16th Amendment"], correct: 1, explanation: "The 14th Amendment contains the Privileges or Immunities Clause, though it's been narrowly interpreted." },
+        { question: "The 27th Amendment was originally proposed as part of:", options: ["The Bill of Rights", "Reconstruction Amendments", "Progressive Era reforms", "New Deal legislation"], correct: 0, explanation: "The 27th Amendment was originally proposed by James Madison as part of the original Bill of Rights." },
+        { question: "Which amendment explicitly mentions 'cruel and unusual punishment'?", options: ["Fifth Amendment", "Sixth Amendment", "Seventh Amendment", "Eighth Amendment"], correct: 3, explanation: "The Eighth Amendment explicitly prohibits 'cruel and unusual punishments.'" },
+        { question: "The 7th Amendment guarantees jury trials in:", options: ["All cases", "Criminal cases only", "Civil cases over $20", "Federal cases only"], correct: 2, explanation: "The 7th Amendment guarantees jury trials in civil cases where the value exceeds twenty dollars." },
+        { question: "Which amendment was the first to include a time limit for ratification?", options: ["16th Amendment", "17th Amendment", "18th Amendment", "19th Amendment"], correct: 2, explanation: "The 18th Amendment was the first to include a seven-year time limit for ratification." },
+        { question: "The 'Lame Duck' Amendment (20th) specifically moved inauguration from:", options: ["January 20 to March 4", "March 4 to January 20", "February 1 to March 4", "March 4 to February 1"], correct: 1, explanation: "The 20th Amendment moved presidential inauguration from March 4 to January 20." },
+        { question: "Which amendment's ratification process was most controversial?", options: ["18th Amendment", "19th Amendment", "Equal Rights Amendment", "27th Amendment"], correct: 2, explanation: "The Equal Rights Amendment passed Congress but failed to achieve ratification by enough states." },
+        { question: "The 14th Amendment's Due Process Clause has been used to:", options: ["Incorporate Bill of Rights to states", "Protect economic rights", "Advance civil rights", "All of the above"], correct: 3, explanation: "The 14th Amendment's Due Process Clause has been interpreted to apply the Bill of Rights to states and protect various rights." },
+        { question: "The 23rd Amendment gives Washington D.C. electoral votes equal to:", options: ["Its population proportion", "The smallest state", "Three votes always", "The largest state"], correct: 1, explanation: "The 23rd Amendment gives D.C. electoral votes equal to the least populous state (minimum 3)." },
+        { question: "Which amendment was proposed by Congress but never ratified?", options: ["Child Labor Amendment", "Equal Rights Amendment", "D.C. Voting Rights Amendment", "All of the above"], correct: 3, explanation: "Several amendments have been proposed by Congress but failed to achieve ratification by the required number of states." },
+        { question: "The 26th Amendment was passed primarily due to:", options: ["Civil rights movement", "Vietnam War", "Women's suffrage", "Great Depression"], correct: 1, explanation: "The 26th Amendment lowering the voting age to 18 was largely motivated by the Vietnam War and the draft." }
+      ]
+    };
+
+    // Global game state variables
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let playerName = "Guest";
+    let quizStartTime;
+    let timerInterval;
+    let timeRemaining = 30; // Default time per question
+
+    // DOM element references
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const leaderboardScreen = document.getElementById('leaderboard-screen');
+
+    const playerNameInput = document.getElementById('player-name');
+    const difficultySelect = document.getElementById('difficulty');
+    const playerDisplayName = document.getElementById('player-display');
+    const currentScoreDisplay = document.getElementById('current-score');
+    const questionCounterDisplay = document.getElementById('question-counter');
+    const timerDisplay = document.getElementById('timer');
+    const progressBarFill = document.getElementById('progress-fill');
+    const questionNumberDisplay = document.getElementById('question-number');
+    const questionTextDisplay = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const nextButton = document.getElementById('next-btn');
+    const explanationDisplay = document.getElementById('explanation');
+
+    const finalScoreDisplay = document.getElementById('final-score');
+    const correctAnswersDisplay = document.getElementById('correct-answers');
+    const totalQuestionsDisplay = document.getElementById('total-questions');
+    const timeTakenDisplay = document.getElementById('time-taken');
+    const leaderboardList = document.getElementById('leaderboard-list');
+
+    // --- Screen Management Functions ---
+    function showScreen(screenToShow) {
+      const allScreens = [startScreen, quizScreen, resultsScreen, leaderboardScreen];
+      allScreens.forEach(screen => screen.classList.remove('active'));
+      screenToShow.classList.add('active');
+    }
+
+    function showStartScreen() {
+      showScreen(startScreen);
+      playerNameInput.value = ""; // Clear name input on returning to start screen
+      difficultySelect.value = "medium"; // Reset difficulty
+      clearInterval(timerInterval); // Clear any running timer
+    }
+
+    function showQuizScreen() {
+      showScreen(quizScreen);
+    }
+
+    function showResultsScreen() {
+      showScreen(resultsScreen);
+    }
+
+    function showLeaderboard() {
+      showScreen(leaderboardScreen);
+      displayLeaderboard();
+    }
+
+    // --- Quiz Logic ---
+    function startQuiz() {
+      playerName = playerNameInput.value.trim();
+      if (playerName === "") {
+        playerName = "Constitutional Scholar";
+      }
+      playerDisplayName.textContent = playerName;
+
+      const difficulty = difficultySelect.value;
+      currentQuestions = shuffleArray([...QUESTIONS[difficulty]]); // Clone and shuffle
+      currentQuestionIndex = 0;
+      score = 0;
+      quizStartTime = Date.now();
+
+      currentScoreDisplay.textContent = score;
+      totalQuestionsDisplay.textContent = currentQuestions.length; // Update total questions on results screen
+      questionCounterDisplay.textContent = `1/${currentQuestions.length}`; // Update question counter
+
+      showQuizScreen();
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      clearInterval(timerInterval); // Clear previous question's timer
+      timeRemaining = 30; // Reset timer for each question
+      timerDisplay.textContent = `Time: ${timeRemaining}s`;
+      startTimer();
+
+      const questionData = currentQuestions[currentQuestionIndex];
+      questionNumberDisplay.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+      questionTextDisplay.textContent = questionData.question;
+      optionsContainer.innerHTML = '';
+      explanationDisplay.style.display = 'none'; // Hide explanation
+
+      questionData.options.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add('option');
+        optionDiv.textContent = option;
+        optionDiv.onclick = () => selectOption(index);
+        optionsContainer.appendChild(optionDiv);
+      });
+
+      nextButton.style.display = 'none'; // Hide next button initially
+      updateProgressBar();
+    }
+
+    function selectOption(selectedIndex) {
+      clearInterval(timerInterval); // Stop the timer when an option is selected
+
+      const questionData = currentQuestions[currentQuestionIndex];
+      const options = optionsContainer.children;
+      const isCorrect = selectedIndex === questionData.correct;
+
+      for (let i = 0; i < options.length; i++) {
+        options[i].classList.add('disabled'); // Disable all options after selection
+        if (i === questionData.correct) {
+          options[i].classList.add('correct');
+        } else if (i === selectedIndex) {
+          options[i].classList.add('incorrect');
+        }
+      }
+
+      if (isCorrect) {
+        score++;
+        currentScoreDisplay.textContent = score;
+      }
+
+      explanationDisplay.innerHTML = `<div class="explanation-title">Explanation:</div>${questionData.explanation}`;
+      explanationDisplay.style.display = 'block';
+
+      nextButton.style.display = 'block'; // Show next button
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < currentQuestions.length) {
+        loadQuestion();
+        questionCounterDisplay.textContent = `${currentQuestionIndex + 1}/${currentQuestions.length}`;
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      clearInterval(timerInterval); // Stop any running timer
+
+      const quizEndTime = Date.now();
+      const timeTakenSeconds = Math.floor((quizEndTime - quizStartTime) / 1000);
+      const percentageScore = (score / currentQuestions.length) * 100;
+
+      finalScoreDisplay.textContent = `${percentageScore.toFixed(0)}%`;
+      correctAnswersDisplay.textContent = score;
+      totalQuestionsDisplay.textContent = currentQuestions.length;
+      timeTakenDisplay.textContent = `${timeTakenSeconds}s`;
+
+      saveScore(playerName, score, currentQuestions.length, timeTakenSeconds);
+      showResultsScreen();
+    }
+
+    function quitQuiz() {
+      clearInterval(timerInterval);
+      showStartScreen();
+    }
+
+    // --- Timer Functions ---
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        timerDisplay.textContent = `Time: ${timeRemaining}s`;
+
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          // Automatically select an incorrect answer if time runs out
+          selectOption(-1); // Pass -1 to indicate no option was selected
+          nextButton.style.display = 'block'; // Show next button
+        }
+      }, 1000);
+    }
+
+    // --- Progress Bar ---
+    function updateProgressBar() {
+      const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+      progressBarFill.style.width = `${progress}%`;
+    }
+
+    // --- Leaderboard Functions ---
+    async function getLeaderboard() {
+      try {
+        const response = await fetch('/api/quiz/leaderboard');
+        if (!response.ok) {
+          throw new Error('Failed to fetch leaderboard');
+        }
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        return [];
+      }
+    }
+
+    async function saveScore(name, score, total, time) {
+      try {
+        const response = await fetch('/api/quiz/score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, score, totalQuestions: total, timeTaken: time })
+        });
+        if (!response.ok) {
+          throw new Error('Failed to save score');
+        }
+      } catch (error) {
+        console.error('Error saving score:', error);
+      }
+    }
+
+    async function displayLeaderboard() {
+      const leaderboard = await getLeaderboard();
+      leaderboardList.innerHTML = ''; // Clear existing list
+
+      if (leaderboard.length === 0) {
+        leaderboardList.innerHTML = `
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">-</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">No scores yet</div>
+              <div class="leaderboard-details">Be the first to play!</div>
+            </div>
+            <div class="leaderboard-score">-</div>
+          </div>
+        `;
+        return;
+      }
+
+      leaderboard.forEach((entry, index) => {
+        const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
+        const listItem = document.createElement('div');
+        listItem.classList.add('leaderboard-item');
+        listItem.innerHTML = `
+          <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">${entry.name}</div>
+            <div class="leaderboard-details">${entry.total_questions} Questions | ${entry.time_taken}s | ${new Date(entry.date).toLocaleDateString()}</div>
+          </div>
+          <div class="leaderboard-score">${entry.score}</div>
+        `;
+        leaderboardList.appendChild(listItem);
+      });
+    }
+
+    // Utility: Shuffle array (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Initial setup when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      showStartScreen(); // Ensure start screen is active on load
+    });
+  </script>
+</body>
+</html>

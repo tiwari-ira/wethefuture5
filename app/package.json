@@ -1,0 +1,30 @@
+{
+  "name": "constitution-typing-game",
+  "version": "0.1.1",
+  "description": "A typing game featuring the US Constitution",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.21.0",
+    "handlebars": "^4.7.8",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6",
+    "@fastify/view": "^8.0.0",
+    "@fastify/static": "^6.10.2",
+    "@fastify/formbody": "^7.4.0"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "repository": {
+    "url": "https://glitch.com/edit/#!/constitution-typing-game"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "glitch",
+    "typing-game"
+  ]
+}

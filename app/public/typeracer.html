@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Type Racer - We the Future</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="modern.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">We the Future</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="typeracer.html">Type Racer</a></li>
+            <li><a href="quiz.html">Quiz Game</a></li>
+            <li><a href="wordle.html">Wordle Game</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <h1>Type Racer</h1>
+        <div id="setup-screen" class="screen">
+            <h2>Choose Your Challenge</h2>
+            <div class="options">
+                <button onclick="startGame('preamble')">Preamble</button>
+                <button onclick="startGame('constitution')">Full Constitution</button>
+            </div>
+            <div class="player-info">
+                <input type="text" id="player-name" placeholder="Enter your name" maxlength="20">
+            </div>
+        </div>
+        <div id="game-screen" class="screen hidden">
+            <div class="stats">
+                <div>WPM: <span id="wpm">0</span></div>
+                <div>Accuracy: <span id="accuracy">100%</span></div>
+                <div>Time: <span id="timer">0:00</span></div>
+            </div>
+            <div class="text-display">
+                <div id="text-to-type" tabindex="0"></div>
+                <input id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="position:absolute;opacity:0;pointer-events:none;">
+            </div>
+            <button id="restart-btn" onclick="resetGame()">Restart</button>
+        </div>
+        <div id="results-screen" class="screen hidden">
+            <h2>Results</h2>
+            <div class="results-stats">
+                <p>Final WPM: <span id="final-wpm">0</span></p>
+                <p>Accuracy: <span id="final-accuracy">0%</span></p>
+                <p>Time: <span id="final-time">0:00</span></p>
+            </div>
+            <button onclick="showLeaderboard()">View Leaderboard</button>
+            <button onclick="resetGame()">Try Again</button>
+        </div>
+        <div id="leaderboard-screen" class="screen hidden">
+            <h2>Leaderboard</h2>
+            <div class="leaderboard-tabs">
+                <button onclick="showLeaderboardTab('preamble')">Preamble</button>
+                <button onclick="showLeaderboardTab('constitution')">Constitution</button>
+            </div>
+            <div id="leaderboard-content"></div>
+            <button onclick="resetGame()">Back to Game</button>
+        </div>
+    </main>
+    <script src="game.js"></script>
+</body>
+</html> 
